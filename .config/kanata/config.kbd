@@ -1,0 +1,14 @@
+(defsrc
+  caps
+  rshift
+)
+
+(defalias
+  escctrl (tap-hold 100 100 esc lctrl)
+  rshift-backspace backspace
+)
+
+(deflayer base
+  @escctrl
+  @rshift-backspace
+)
