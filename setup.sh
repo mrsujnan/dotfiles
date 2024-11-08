@@ -1,114 +1,137 @@
 #!/bin/bash
 
-# Define the apps to manage and the GitHub repository URL
-apps=("tmux" "nvim" "zoxide" "alacritty" "ohmyposh")
-github_repo="https://github.com/mrsujnan/dotfiles.git"
-temp_dir="$HOME/temp_dotfiles"
+# Setup script for configuring various apps
 
-# Colors for pretty output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Print a section header
-section() {
-    echo -e "${CYAN}==> $1${NC}"
-}
-
-# Install packages based on detected Linux distribution
-install_packages() {
-    section "Detecting Linux distribution and installing packages..."
-    if [ -f /etc/os-release ]; then
-        distro_id=$(grep '^ID=' /etc/os-release | cut -d'=' -f2)
-
-        if [[ "$distro_id" == "arch" ]]; then
-            echo -e "${GREEN}Arch Linux detected. Installing packages...${NC}"
-            sudo pacman -Syu --noconfirm
-            sudo pacman -S --noconfirm tmux neovim zoxide alacritty
-            git clone https://aur.archlinux.org/oh-my-posh-bin.git
-            cd oh-my-posh-bin && makepkg -si --noconfirm && cd ..
-            rm -rf oh-my-posh-bin
-
-        elif [[ "$distro_id" == "kali" ]]; then
-            echo -e "${GREEN}Kali Linux detected. Installing packages...${NC}"
-            sudo apt update && sudo apt upgrade -y
-            sudo apt install -y tmux zoxide alacritty wget unzip
-
-            # Install latest Neovim
-            wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
-            tar xzf nvim-linux64.tar.gz
-            sudo mv nvim-linux64/bin/nvim /usr/local/bin/
-            rm -rf nvim-linux64 nvim-linux64.tar.gz
-
-            # Install oh-my-posh
-            wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O oh-my-posh
-            sudo install oh-my-posh /usr/local/bin/oh-my-posh
-            rm oh-my-posh
-
-        else
-            echo -e "${RED}Unknown Linux distribution: $distro_id${NC}"
-            exit 1
-        fi
+# Function to check Linux distro
+check_distro() {
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        DISTRO=$ID
     else
-        echo -e "${RED}/etc/os-release not found. Cannot determine Linux distribution.${NC}"
+        echo "Unknown Linux distribution. Exiting."
         exit 1
     fi
 }
 
-# Install necessary packages
-install_packages
+# Check the distro and install the necessary packages
+install_packages() {
+    case $DISTRO in
+        arch)
+            echo "Installing packages for Arch Linux..."
+            sudo pacman -Syu --noconfirm tmux nvim zoxide alacritty oh-my-posh
+            ;;
+        kali)
+            echo "Installing packages for Kali Linux..."
+            sudo apt update && sudo apt install -y tmux neovim zoxide alacritty oh-my-posh
+            ;;
+        *)
+            echo "Unsupported distro: $DISTRO. Exiting."
+            exit 1
+            ;;
+    esac
+}
 
-# Clone GitHub repository
-section "Cloning GitHub repository..."
-if git clone "$github_repo" "$temp_dir"; then
-    echo -e "${GREEN}Repository cloned successfully.${NC}"
-else
-    echo -e "${RED}Failed to clone repository.${NC}"
-    exit 1
-fi
-
-# Remove and copy configurations interactively
-for app in "${apps[@]}"; do
-    read -p "$(echo -e "${YELLOW}Do you want to replace the configuration for $app? (y/n): ${NC}")" response
-    if [[ "$response" == "y" || "$response" == "Y" ]]; then
-        config_path="$HOME/.config/$app"
-        if [ -d "$config_path" ]; then
-            rm -rf "$config_path"
-            echo -e "${CYAN}Removed existing configuration for $app.${NC}"
-        fi
-
-        repo_config_path="$temp_dir/.config/$app"
-        if [ -d "$repo_config_path" ]; then
-            mv "$repo_config_path" "$HOME/.config/"
-            echo -e "${GREEN}Moved configuration for $app to ~/.config.${NC}"
-        else
-            echo -e "${RED}No configuration found for $app in the repository.${NC}"
-        fi
-    else
-        echo -e "${CYAN}Skipped configuration for $app.${NC}"
+# Setup tmux
+setup_tmux() {
+    echo "Setting up tmux..."
+    cp .tmux.conf ~/.tmux.conf
+    # Installing tmux plugin manager
+    if [ ! -d "~/.tmux/plugins/tpm" ]; then
+        git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
     fi
-done
+    # Install tmux plugins
+    echo "Press prefix + I to install plugins"
+}
 
-# Ask for confirmation to replace .zshrc
-read -p "$(echo -e "${YELLOW}Do you want to replace .zshrc with the one in the repository? (y/n): ${NC}")" response
-if [[ "$response" == "y" || "$response" == "Y" ]]; then
-    if [ -f "$HOME/.zshrc" ]; then
-        rm "$HOME/.zshrc"
-        echo -e "${CYAN}Removed existing .zshrc file.${NC}"
+# Setup neovim
+setup_nvim() {
+    echo "Setting up Neovim..."
+    mkdir -p ~/.config/nvim
+    cp -r nvim/* ~/.config/nvim/
+}
+
+# Setup zoxide
+setup_zoxide() {
+    echo "Setting up Zoxide..."
+    mkdir -p ~/.config/zoxide
+    cp zoxide/config.toml ~/.config/zoxide/config.toml
+}
+
+# Setup alacritty
+setup_alacritty() {
+    echo "Setting up Alacritty..."
+    mkdir -p ~/.config/alacritty
+    cp alacritty/alacritty.yml ~/.config/alacritty/alacritty.yml
+}
+
+# Setup oh-my-posh
+setup_ohmyposh() {
+    echo "Setting up Oh My Posh..."
+    mkdir -p ~/.config/oh-my-posh
+    cp oh-my-posh/oh-my-posh.json ~/.config/oh-my-posh/oh-my-posh.json
+}
+
+# Setup zshrc
+setup_zshrc() {
+    echo "Setting up Zsh..."
+    cp .zshrc ~/.zshrc
+}
+
+# Interactive prompt for each app
+interactive_setup() {
+    echo "Do you want to replace your tmux configuration? (yes/no)"
+    read -r tmux_response
+    if [[ "$tmux_response" == "yes" ]]; then
+        setup_tmux
     fi
 
-    if [ -f "$temp_dir/.zshrc" ]; then
-        mv "$temp_dir/.zshrc" "$HOME/"
-        echo -e "${GREEN}Moved .zshrc to home directory.${NC}"
-    else
-        echo -e "${RED}.zshrc file not found in the repository.${NC}"
+    echo "Do you want to replace your Neovim configuration? (yes/no)"
+    read -r nvim_response
+    if [[ "$nvim_response" == "yes" ]]; then
+        setup_nvim
     fi
-else
-    echo -e "${CYAN}Skipped .zshrc replacement.${NC}"
-fi
 
-# Cleanup temporary directory
-rm -rf "$temp_dir"
-echo -e "${GREEN}Setup complete.${NC}"
+    echo "Do you want to replace your Zoxide configuration? (yes/no)"
+    read -r zoxide_response
+    if [[ "$zoxide_response" == "yes" ]]; then
+        setup_zoxide
+    fi
+
+    echo "Do you want to replace your Alacritty configuration? (yes/no)"
+    read -r alacritty_response
+    if [[ "$alacritty_response" == "yes" ]]; then
+        setup_alacritty
+    fi
+
+    echo "Do you want to replace your Oh My Posh configuration? (yes/no)"
+    read -r ohmyposh_response
+    if [[ "$ohmyposh_response" == "yes" ]]; then
+        setup_ohmyposh
+    fi
+
+    echo "Do you want to replace your .zshrc file? (yes/no)"
+    read -r zshrc_response
+    if [[ "$zshrc_response" == "yes" ]]; then
+        setup_zshrc
+    fi
+}
+
+# Main setup
+main() {
+    echo "Welcome to the dotfiles setup script!"
+    
+    # Detect distribution
+    check_distro
+
+    # Install necessary packages
+    install_packages
+
+    # Perform interactive setup
+    interactive_setup
+
+    echo "Setup is complete. You can now press 'prefix + I' in tmux to install plugins."
+    echo "For further setup, you can adjust individual configurations in ~/.config."
+}
+
+# Execute main function
+main
