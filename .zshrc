@@ -68,6 +68,10 @@ alias c='clear'
 alias x='exit'
 alias std='shutdown now'
 alias tsx='tmux new -s'
+alias tat="tmux attach"
+alias tde='tmux detach -s'
+alias tcl='tmux kill-server'
+
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
