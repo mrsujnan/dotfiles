@@ -1,3 +1,7 @@
+(deflayer base
+  @escctrl
+  @rshift-backspace
+)
 (defsrc
   caps
   rshift
@@ -5,10 +9,6 @@
 
 (defalias
   escctrl (tap-hold 100 100 esc lctrl)
-  rshift-backspace backspace
+  rshift-backspace KC_BSPC  ; Use KC_BSPC for backspace
 )
 
-(deflayer base
-  @escctrl
-  @rshift-backspace
-)
