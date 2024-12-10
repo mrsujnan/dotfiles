@@ -255,6 +255,9 @@ toggle do not disturb=none,,Toggle do not disturb
 [services][Alacritty.desktop]
 New=Meta+T
 
+[services][com.github.wwmm.easyeffects.desktop]
+_launch=Alt+E
+
 [services][firefox.desktop]
 _launch=Meta+F
 
