@@ -72,6 +72,7 @@ alias tat="tmux attach"
 alias tde='tmux detach -s'
 alias tcl='tmux kill-server'
 alias z='cd'
+alias sourpy='source ~/Documents/myenv/bin/activate'
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
