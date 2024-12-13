@@ -68,11 +68,12 @@ alias c='clear'
 alias x='exit'
 alias std='shutdown now'
 alias tsx='tmux new -s'
-alias tat="tmux attach"
+alias tat="tmux attach -t"
 alias tde='tmux detach -s'
 alias tcl='tmux kill-server'
 alias z='cd'
 alias sourpy='source ~/Documents/myenv/bin/activate'
+
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
