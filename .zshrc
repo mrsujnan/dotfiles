@@ -37,8 +37,8 @@ eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/omp.toml)"
 
 # Keybindings
 bindkey -e
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
+bindkey '^j' history-search-backward
+bindkey '^k' history-search-forward
 bindkey '^[w' kill-region
 
 # History

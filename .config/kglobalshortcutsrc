@@ -261,5 +261,11 @@ _launch=Alt+E
 [services][firefox.desktop]
 _launch=Meta+F
 
+[services][org.pwmt.zathura.desktop]
+_launch=Alt+Z
+
 [services][org.qutebrowser.qutebrowser.desktop]
 _launch=Alt+Q
+
+[services][spotify-launcher.desktop]
+_launch=Alt+S
