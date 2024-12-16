@@ -1,7 +1,7 @@
 Packages To install``
 
 ```bash
-sudo pacman -S neovim git python easyeffects reflector bluez blueman bluez-utils p7zip unzip unrar firefox vlc stow tmux zsh fzf zoxide
+sudo pacman -S neovim git python easyeffects reflector bluez blueman bluez-utils p7zip unzip unrar firefox vlc stow tmux zsh fzf zoxide lsp-plugins
 yay -S  oh-my-posh kanata spotify #install yay first
 ```
 
