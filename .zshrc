@@ -72,9 +72,11 @@ alias tat="tmux attach -t"
 alias tde='tmux detach -s'
 alias tcl='tmux kill-server'
 alias z='cd'
-alias sourpy='source ~/Documents/myenv/bin/activate'
+alias sourpy='source ~/pyenv/bin/activate'
 alias septy='ollama run septy'
 alias update='echo "Updating pacman packages" && sudo pacman -Syu && echo "Updating yay packages" && yay -Syu'
+alias startllama='sudo systemctl start ollama'
+alias stopllama='sudo systemctl stop ollama'
 
 # Shell integrations
 eval "$(fzf --zsh)"
