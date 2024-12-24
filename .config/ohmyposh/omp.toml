@@ -4,7 +4,7 @@ final_space = true
 
 [secondary_prompt]
   template = '❯❯ '
-  foreground = 'magenta'
+  foreground = 'white'
   background = 'transparent'
 
 [transient_prompt]
@@ -19,9 +19,16 @@ final_space = true
 
   [[blocks.segments]]
     style = 'plain'
-    template = '{{ .Path }}'
-    foreground = 'blue'
+    template = '{{ .User }}'
+    foreground = 'green'
     background = 'transparent'
+    type = 'username'
+
+  [[blocks.segments]]
+    style = 'plain'
+    template = '{{ .Path }}'
+    foreground = 'green'
+    background = 'black'
     type = 'path'
 
     [blocks.segments.properties]
@@ -60,7 +67,7 @@ final_space = true
 
   [[blocks.segments]]
     style = 'plain'
-    template = '❯'
-    background = 'transparent'
+    template = '{{ .UserName  }}@{{  .HostName  }} ❯'
+    background = 'white'
     type = 'text'
-    foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}magenta{{end}}']
+    foreground_templates = ['{{if gt .Code 0}}red{{end}}', '{{if eq .Code 0}}black{{end}}']  

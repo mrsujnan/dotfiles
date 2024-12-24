@@ -40,6 +40,8 @@ bindkey -e
 bindkey '^j' history-search-backward
 bindkey '^k' history-search-forward
 bindkey '^[w' kill-region
+# Bind Ctrl + L to the right arrow key
+bindkey '^h' vi-forward-char
 
 # History
 HISTSIZE=20000
@@ -77,6 +79,7 @@ alias septy='ollama run septy'
 alias update='echo "Updating pacman packages" && sudo pacman -Syu && echo "Updating yay packages" && yay -Syu'
 alias startllama='sudo systemctl start ollama'
 alias stopllama='sudo systemctl stop ollama'
+alias gpp='g++'
 
 # Shell integrations
 eval "$(fzf --zsh)"
