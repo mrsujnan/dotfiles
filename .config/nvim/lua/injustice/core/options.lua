@@ -1,4 +1,5 @@
 vim.cmd("let g:netrw_liststyle = 3")
+vim.o.guicursor = "n-v-c:block,i:blinkon1"
 
 local opt = vim.opt
 
