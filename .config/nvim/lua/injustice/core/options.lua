@@ -1,5 +1,6 @@
 vim.cmd("let g:netrw_liststyle = 3")
 vim.o.guicursor = "n-v-c:block,i:blinkon1"
+vim.opt.clipboard = "unnamedplus"
 
 local opt = vim.opt
 
