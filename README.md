@@ -1,8 +1,8 @@
 Packages To install``
 
 ```bash
-sudo pacman -S neovim git python easyeffects reflector bluez blueman bluez-utils p7zip unzip unrar firefox vlc stow tmux zsh fzf zoxide lsp-plugins
-yay -S  oh-my-posh kanata spotify #install yay first
+sudo pacman -S neovim git python easyeffects reflector bluez blueman bluez-utils p7zip unzip unrar firefox vlc stow tmux zsh fzf zoxide lsp-plugins unzip npm wl-clipboard swaync
+yay -S  oh-my-posh kanata spotify hyprshot #install yay first
 ```
 
 Pacman
@@ -77,6 +77,16 @@ EasyEffects and DolbyAtmos
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/JackHack96/PulseEffects-Presets/master/install.sh)" #https://www.reddit.com/r/linuxquestions/comments/pfl0g7/dolby_atmos_support_in_linux/
+
+```
+
+Git
+
+```bash
+git config user.email ""
+git config user.name ""
+git config --global core.editor nvim
+git remote set-url origin https://scuzzlebuzzle:<MYTOKEN>@github.com/scuzzlebuzzle/ol3-1.git
 
 ```
 
