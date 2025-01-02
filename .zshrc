@@ -79,7 +79,7 @@ alias septy='ollama run septy'
 alias update='echo "Updating pacman packages" && sudo pacman -Syu && echo "Updating yay packages" && yay -Syu'
 alias startllama='sudo systemctl start ollama'
 alias stopllama='sudo systemctl stop ollama'
-alias gpp='g++'
+alias spl='cd /home/injustice/Documents/splitgram/'
 
 # Shell integrations
 eval "$(fzf --zsh)"
