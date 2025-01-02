@@ -13,7 +13,7 @@ title="omega"
 
 [font]
 normal.family = "Hack Nerd Font "
-normal.style="bold"
+bold.style="bold"
 size = 14
 
 [selection]
