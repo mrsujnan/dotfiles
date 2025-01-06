@@ -97,3 +97,9 @@ git clone https://github.com/mrsujnan/dotfiles.git
 cd dotfiles
 stow --adopt .
 ```
+
+Qemu
+
+```bash
+https://www.youtube.com/watch?v=2wUZ5KdaFhU
+```
