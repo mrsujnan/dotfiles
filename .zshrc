@@ -80,6 +80,7 @@ alias update='echo "Updating pacman packages" && sudo pacman -Syu && echo "Updat
 alias startllama='sudo systemctl start ollama'
 alias stopllama='sudo systemctl stop ollama'
 alias spl='cd /home/injustice/Documents/splitgram/'
+alias resolve='/opt/resolve/bin/resolve'
 
 # Shell integrations
 eval "$(fzf --zsh)"
