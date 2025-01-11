@@ -121,6 +121,47 @@ require("lazy").setup({
         end,
     },
 
+    {
+    "L3MON4D3/LuaSnip",
+    dependencies = { "saadparwaiz1/cmp_luasnip" },
+    config = function()
+        require('luasnip').config.set_config({
+            history = true,
+            updateevents = "TextChanged,TextChangedI",
+        })
+        -- Link cmp_luasnip to cmp
+        local cmp = require('cmp')
+        cmp.setup({
+            sources = {
+                { name = 'nvim_lsp' },
+                { name = 'luasnip' },
+            },
+        })
+    end
+};
+
+{
+    "nvim-lualine/lualine.nvim",
+    config = function()
+        require('lualine').setup({
+            options = {
+                icons_enabled = true,
+                theme = 'dracula',
+                component_separators = { left = '', right = '' },
+                section_separators = { left = '', right = '' },
+            },
+            sections = {
+                lualine_a = { 'mode' },
+                lualine_b = { 'branch', 'diff', 'diagnostics' },
+                lualine_c = { 'filename' },
+                lualine_x = { 'encoding', 'fileformat', 'filetype' },
+                lualine_y = { 'progress' },
+                lualine_z = { 'location' },
+            },
+        })
+    end
+};
+
     -- fzf file search plugin
     {
         "junegunn/fzf.vim",
@@ -133,6 +174,58 @@ require("lazy").setup({
             vim.keymap.set("n", "<leader>fl", ":Lines<CR>", { desc = "Search Lines" })
         end,
     },
+
+    {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+        "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-buffer",
+        "hrsh7th/cmp-path",
+        "hrsh7th/cmp-cmdline",  -- For Bash command completion
+        "hrsh7th/cmp-nvim-lua",  -- For Lua completions
+        "ray-x/cmp-treesitter",  -- Treesitter completion for various languages
+    },
+    config = function()
+        local cmp = require("cmp")
+        cmp.setup({
+            mapping = cmp.mapping.preset.insert({
+                ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+                ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+                ["<C-Space>"] = cmp.mapping.complete(),
+                ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                ["<Tab>"] = cmp.mapping(function(fallback)
+                    if cmp.visible() then
+                        cmp.select_next_item()
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" }),
+                ["<S-Tab>"] = cmp.mapping(function(fallback)
+                    if cmp.visible() then
+                        cmp.select_prev_item()
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" }),
+            }),
+            sources = {
+                { name = "nvim_lsp" },
+                { name = "buffer" },
+                { name = "path" },
+                { name = "cmdline" },  -- Bash cmdline
+                { name = "nvim_lua" },  -- Lua
+                { name = "treesitter" },  -- Treesitter sources (for more languages)
+            },
+        })
+
+        -- Specific LSP setups for Bash, Python, Make, CMake, etc.
+        local lspconfig = require("lspconfig")
+        lspconfig.bashls.setup{}
+        lspconfig.pyright.setup{}
+        lspconfig.ccls.setup{}  -- CMake, Make (C/C++ support)
+        lspconfig.cssls.setup{}
+    end,
+},
 
     -- Autocompletion setup
     {
