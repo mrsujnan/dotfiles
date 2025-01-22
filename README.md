@@ -49,7 +49,7 @@ Tmux
 Kanata
 
 ```bash
-sudo cp ~/dotfiles/kanata.service /lib/systemd/system/kanata.service
+sudo cp ~/dotfiles/ignores/kanata.service /lib/systemd/system/kanata.service
 sudo systemctl daemon-reload
 sudo systemctl start kanata
 sudo systemctl enable kanata
@@ -99,8 +99,29 @@ cd dotfiles
 stow --adopt .
 ```
 
+
 Qemu
 
 ```bash
-https://www.youtube.com/watch?v=2wUZ5KdaFhU
+#https://www.youtube.com/watch?v=2wUZ5KdaFhU
+sudo pacman -Sy qemu-full virt-manager dnsmasq bridge-utils libguestfs iptables-nft vde2 openbsd-netcat
+sudo systemctl enable libvirtd.service
+sudo systemctl start libvirtd.service
+sudo vim /etc/libvirt/libvirtd.conf # and uncomment these lines unix_sock_group = "libvert" & unix_sock_rw_perms = "0770"
+sudo usermod -a -G libvirt $(whoami)
+newgrp libvirt #add user to libvert group
+sudo systemctl restart libvirtd.service
+sudo vim /etc/libvirt/network.conf # firewell backend to iptables
+sudo systemctl enable iptables.service 
+sudo systemctl start iptables.service 
+sudo systemctl restart libvirtd.service
+### AMD Processor ###
+sudo modprobe -r kvm_amd
+sudo modprobe kvm_amd nested=1
+echo "options kvm-amd nested=1" | sudo tee /etc/modprobe.d/amd-intel.conf
+```
+```bash
+sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.122.100:8080
+sudo iptables -t nat -A POSTROUTING -p tcp --dport 8080 -j MASQUERADE
+
 ```

@@ -1,9 +1,9 @@
 set nocompatible
-set showmatch 
-set ignorecase 
-set mouse=a 
-set hlsearch 
-set incsearch 
+set showmatch
+set ignorecase
+set mouse=a
+set hlsearch
+set incsearch
 set tabstop=4
 set softtabstop=4
 set expandtab
@@ -25,7 +25,12 @@ inoremap jk <Esc>
 vnoremap jk <Esc>
 nnoremap <leader>d "_d
 vnoremap <leader>d "_d
-nnoremap <Leader>ee :call ToggleExMode()<CR>
+nnoremap <leader>nh :nohlsearch<CR>
+nnoremap <leader>sv :vsplit<CR>
+nnoremap <leader>sh :split<CR>
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+nnoremap sx :close<CR>
 
 " Install lazy.nvim if not already installed
 if empty(glob(stdpath('data') . '/lazy/lazy.nvim'))
@@ -36,288 +41,139 @@ set runtimepath+=~/.local/share/nvim/lazy/lazy.nvim
 " Plugin configuration
 lua << EOF
 require("lazy").setup({
+
     -- LSP configuration
     {
         "neovim/nvim-lspconfig",
+        dependencies = {
+            "williamboman/mason.nvim",
+            "williamboman/mason-lspconfig.nvim",
+        },
         config = function()
+            require("mason").setup()
+            require("mason-lspconfig").setup()
+
             local lspconfig = require("lspconfig")
-            lspconfig.clangd.setup({
-                cmd = { "clangd" },
-                filetypes = { "c", "cpp", "objc", "objcpp" },
-                root_dir = lspconfig.util.root_pattern("compile_commands.json", ".git"),
-                capabilities = require("cmp_nvim_lsp").default_capabilities(),
-            })
-        end,
-    },
+            local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-    {
-        "ThePrimeagen/harpoon",
-        dependencies = { "nvim-lua/plenary.nvim" },
-        config = function()
-            local mark = require("harpoon.mark")
-            local ui = require("harpoon.ui")
-
-            -- Keymaps for Harpoon
-            vim.keymap.set("n", "<leader>aa", mark.add_file, { desc = "Add file to Harpoon" })
-            vim.keymap.set("n", "<leader>ss", ui.toggle_quick_menu, { desc = "Open Harpoon menu" })
-        end,
-    },
-
-    -- Autopairs for brackets and quotes
-    {
-        "windwp/nvim-autopairs",
-        config = function()
-            require("nvim-autopairs").setup({
-                check_ts = true, -- Enable Treesitter integration
-                disable_filetype = { "TelescopePrompt", "vim" }, -- Disable in specific filetypes
-            })
-        end,
-    },
-
-    -- File Explorer with icons and Nerd Fonts
-    {
-        "nvim-tree/nvim-tree.lua",  -- File explorer plugin
-        dependencies = { "nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons" }, -- Required dependencies
-        config = function()
-            local nvim_tree = require("nvim-tree")
-
-            -- Configure nvim-tree with file icons
-            nvim_tree.setup({
-                hijack_netrw = true,  -- Hijack netrw to prevent conflicts
-                view = {
-                    width = 25,  -- Set the width of the tree window
-                    side = "left",  -- Open on the left side
-                },
-                renderer = {
-                    icons = {
-                        webdev_colors = true,  -- Enable color icons for web development languages
-                        show = {
-                            file = true,   -- Show file icons
-                            folder = true,  -- Show folder icons
-                            folder_arrow = true,  -- Show folder arrow icon
-                        },
-                        glyphs = {
-                            default = "",  -- Default file icon
-                            symlink = "",  -- Symlink icon
-                            folder = {
-                                arrow_open = "",  -- Open folder icon
-                                arrow_closed = "",  -- Closed folder icon
-                            },
-                            git = {
-                                unstaged = "✗",  -- Unstaged file icon
-                                staged = "✓",    -- Staged file icon
-                                untracked = "★", -- Untracked file icon
-                                deleted = "",   -- Deleted file icon
-                                renamed = "➜",   -- Renamed file icon
-                                ignored = "◌",   -- Ignored file icon
-                            },
-                        },
-                    },
-                },
+            -- Python LSP with Pyright
+            lspconfig.pyright.setup({
+                capabilities = capabilities,
+                root_dir = lspconfig.util.root_pattern(".git", "setup.py", "setup.cfg", "pyproject.toml", "requirements.txt"),
             })
 
-            -- Keymap for toggling the file explorer
-            vim.keymap.set("n", "<leader>ee", ":NvimTreeToggle<CR>", { desc = "Toggle NvimTree" })
+            -- Keybindings for LSP
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
+            vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Show References" })
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Show Hover" })
+            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
         end,
     },
 
-    {
-    "L3MON4D3/LuaSnip",
-    dependencies = { "saadparwaiz1/cmp_luasnip" },
-    config = function()
-        require('luasnip').config.set_config({
-            history = true,
-            updateevents = "TextChanged,TextChangedI",
-        })
-        -- Link cmp_luasnip to cmp
-        local cmp = require('cmp')
-        cmp.setup({
-            sources = {
-                { name = 'nvim_lsp' },
-                { name = 'luasnip' },
-            },
-        })
-    end
-};
-
-{
-    "nvim-lualine/lualine.nvim",
-    config = function()
-        require('lualine').setup({
-            options = {
-                icons_enabled = true,
-                theme = 'dracula',
-                component_separators = { left = '', right = '' },
-                section_separators = { left = '', right = '' },
-            },
-            sections = {
-                lualine_a = { 'mode' },
-                lualine_b = { 'branch', 'diff', 'diagnostics' },
-                lualine_c = { 'filename' },
-                lualine_x = { 'encoding', 'fileformat', 'filetype' },
-                lualine_y = { 'progress' },
-                lualine_z = { 'location' },
-            },
-        })
-    end
-};
-
-    -- fzf file search plugin
-    {
-        "junegunn/fzf.vim",
-        dependencies = { "junegunn/fzf" },
-        config = function()
-            -- Keymaps for fzf file search
-            vim.keymap.set("n", "<leader>ff", ":Files<CR>", { desc = "Find Files" })
-            vim.keymap.set("n", "<leader>fg", ":GFiles<CR>", { desc = "Find Git Files" })
-            vim.keymap.set("n", "<leader>fb", ":Buffers<CR>", { desc = "Find Buffers" })
-            vim.keymap.set("n", "<leader>fl", ":Lines<CR>", { desc = "Search Lines" })
-        end,
-    },
-
-    {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-        "hrsh7th/cmp-nvim-lsp",
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
-        "hrsh7th/cmp-cmdline",  -- For Bash command completion
-        "hrsh7th/cmp-nvim-lua",  -- For Lua completions
-        "ray-x/cmp-treesitter",  -- Treesitter completion for various languages
-    },
-    config = function()
-        local cmp = require("cmp")
-        cmp.setup({
-            mapping = cmp.mapping.preset.insert({
-                ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-                ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-                ["<C-Space>"] = cmp.mapping.complete(),
-                ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                ["<Tab>"] = cmp.mapping(function(fallback)
-                    if cmp.visible() then
-                        cmp.select_next_item()
-                    else
-                        fallback()
-                    end
-                end, { "i", "s" }),
-                ["<S-Tab>"] = cmp.mapping(function(fallback)
-                    if cmp.visible() then
-                        cmp.select_prev_item()
-                    else
-                        fallback()
-                    end
-                end, { "i", "s" }),
-            }),
-            sources = {
-                { name = "nvim_lsp" },
-                { name = "buffer" },
-                { name = "path" },
-                { name = "cmdline" },  -- Bash cmdline
-                { name = "nvim_lua" },  -- Lua
-                { name = "treesitter" },  -- Treesitter sources (for more languages)
-            },
-        })
-
-        -- Specific LSP setups for Bash, Python, Make, CMake, etc.
-        local lspconfig = require("lspconfig")
-        lspconfig.bashls.setup{}
-        lspconfig.pyright.setup{}
-        lspconfig.ccls.setup{}  -- CMake, Make (C/C++ support)
-        lspconfig.cssls.setup{}
-    end,
-},
-
-    -- Autocompletion setup
+    -- Autocompletion
     {
         "hrsh7th/nvim-cmp",
         dependencies = {
             "hrsh7th/cmp-nvim-lsp",
             "hrsh7th/cmp-buffer",
             "hrsh7th/cmp-path",
+            "hrsh7th/cmp-cmdline",
+            "saadparwaiz1/cmp_luasnip",
+            "L3MON4D3/LuaSnip",
         },
         config = function()
             local cmp = require("cmp")
+            local luasnip = require("luasnip")
+
             cmp.setup({
+                snippet = {
+                    expand = function(args)
+                        luasnip.lsp_expand(args.body)
+                    end,
+                },
                 mapping = cmp.mapping.preset.insert({
-                    ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-                    ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+                    ["<C-j>"] = cmp.mapping.select_next_item(),
+                    ["<C-k>"] = cmp.mapping.select_prev_item(),
                     ["<C-Space>"] = cmp.mapping.complete(),
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                    ["<Tab>"] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            cmp.select_next_item()
-                        else
-                            fallback()
-                        end
-                    end, { "i", "s" }),
-                    ["<S-Tab>"] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            cmp.select_prev_item()
-                        else
-                            fallback()
-                        end
-                    end, { "i", "s" }),
                 }),
                 sources = {
                     { name = "nvim_lsp" },
                     { name = "buffer" },
                     { name = "path" },
+                    { name = "luasnip" },
                 },
             })
+        end,
+    },
+
+    -- Treesitter for syntax highlighting
+    {
+        "nvim-treesitter/nvim-treesitter",
+        run = ":TSUpdate",
+        config = function()
+            require("nvim-treesitter.configs").setup({
+                ensure_installed = { "python", "lua", "bash", "json", "yaml", "markdown" },
+                highlight = { enable = true },
+            })
+        end,
+    },
+
+    -- Formatting and linting with null-ls
+    {
+        "jose-elias-alvarez/null-ls.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+            local null_ls = require("null-ls")
+
+            null_ls.setup({
+                sources = {
+                    null_ls.builtins.formatting.black,
+                    null_ls.builtins.formatting.isort,
+                    null_ls.builtins.diagnostics.flake8,
+                },
+            })
+
+            -- Format on save
+            vim.cmd([[autocmd BufWritePre *.py lua vim.lsp.buf.format()]])
+        end,
+    },
+
+    -- Lualine status bar
+    {
+        "nvim-lualine/lualine.nvim",
+        config = function()
+            require("lualine").setup({
+                options = {
+                    theme = "dracula",
+                },
+            })
+        end,
+    },
+
+    -- File Explorer
+    {
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("nvim-tree").setup({})
+            vim.keymap.set("n", "<leader>ee", ":NvimTreeToggle<CR>", { desc = "Toggle File Explorer" })
+        end,
+    },
+
+    -- Telescope for fuzzy finding
+    {
+        "nvim-telescope/telescope.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+            local telescope = require("telescope")
+            telescope.setup({})
+            vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find Files" })
+            vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Search Text" })
         end,
     },
 })
 EOF
 
-let g:ex_mode_active = 0
-
-function! ToggleExMode()
-    if g:ex_mode_active == 0
-        execute 'Ex'
-        let g:ex_mode_active = 1
-    else
-        b#
-        let g:ex_mode_active = 0
-    endif
-endfunction
-
-augroup ExMappings
-    autocmd!
-    autocmd FileType netrw nnoremap <buffer> a :call CreateFile()<CR>
-    autocmd FileType netrw nnoremap <buffer> r :call RenameFile()<CR>
-    autocmd FileType netrw nnoremap <buffer> d :call CreateDirectory()<CR>
-augroup END
-
-function! CreateFile()
-    let l:file = input('Enter filename: ')
-    if l:file != ''
-        execute 'edit ' . l:file
-    endif
-endfunction
-
-function! RenameFile()
-    let l:old_name = expand('%')
-    let l:new_name = input('Rename ' . l:old_name . ' to: ')
-    if l:new_name != '' && l:old_name != l:new_name
-        execute 'saveas ' . l:new_name
-        execute 'bdelete ' . l:old_name
-    endif
-endfunction
-
-function! CreateDirectory()
-    let l:dir = input('Enter directory name: ')
-    if l:dir != ''
-        execute '!mkdir ' . l:dir
-        execute 'e ' . l:dir
-    endif
-endfunction
-
-nnoremap <leader>rr :%s/
-nnoremap <leader>as /
-nnoremap <leader>nh :nohlsearch<CR>
-nnoremap <leader>sv :vsplit<CR>
-nnoremap <leader>sh :split<CR>
-nnoremap <C-h> <C-w>h
-nnoremap <C-l> <C-w>l
-nnoremap sx :close<CR>
+set completeopt=menu,menuone,noselect
 
