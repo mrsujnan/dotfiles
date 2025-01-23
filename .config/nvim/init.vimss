@@ -1,3 +1,4 @@
+" General Settings
 set nocompatible
 set showmatch
 set ignorecase
@@ -18,6 +19,13 @@ syntax on
 set clipboard=unnamedplus
 set cursorline
 set ttyfast
+
+" Fallback for colorscheme
+if exists("g:colors_name") && g:colors_name != "wildcharm"
+    colorscheme default
+else
+    colorscheme wildcharm
+endif
 
 " Key mappings
 let mapleader = " "
@@ -113,13 +121,36 @@ require("lazy").setup({
         run = ":TSUpdate",
         config = function()
             require("nvim-treesitter.configs").setup({
-                ensure_installed = { "python", "lua", "bash", "json", "yaml", "markdown" },
+                ensure_installed = { "python", "lua", "bash", "json", "yaml", "markdown", "markdown_inline" },
                 highlight = { enable = true },
             })
         end,
     },
 
-    -- Formatting and linting with null-ls
+    -- Obsidian Plugin
+    {
+        "epwalsh/obsidian.nvim",
+        lazy = true,
+        ft = "markdown",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "hrsh7th/nvim-cmp",
+            "nvim-telescope/telescope.nvim",
+        },
+        opts = {
+            workspaces = {
+                { name = "personal", path = "~/Documents/obsidian" },
+                { name = "work", path = "~/Documents/obsidian-work" },
+            },
+        },
+        config = function(_, opts)
+            require("obsidian").setup(opts)
+            local keymap = vim.keymap.set
+            keymap("n", "<leader>on", ":ObsidianNewNote<CR>", { desc = "New Note" })
+        end,
+    },
+
+    -- Null-LS for formatting and linting
     {
         "jose-elias-alvarez/null-ls.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
@@ -166,8 +197,7 @@ require("lazy").setup({
         "nvim-telescope/telescope.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
-            local telescope = require("telescope")
-            telescope.setup({})
+            require("telescope").setup({})
             vim.keymap.set("n", "<leader>ff", ":Telescope find_files<CR>", { desc = "Find Files" })
             vim.keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>", { desc = "Search Text" })
         end,

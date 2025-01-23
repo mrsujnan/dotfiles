@@ -107,7 +107,10 @@ Qemu
 sudo pacman -Sy qemu-full virt-manager dnsmasq bridge-utils libguestfs iptables-nft vde2 openbsd-netcat
 sudo systemctl enable libvirtd.service
 sudo systemctl start libvirtd.service
-sudo vim /etc/libvirt/libvirtd.conf # and uncomment these lines unix_sock_group = "libvert" & unix_sock_rw_perms = "0770"
+sudo vim /etc/libvirt/libvirtd.conf
+```
+# and uncomment these lines unix_sock_group = "libvert" & unix_sock_rw_perms = "0770"
+```bash
 sudo usermod -a -G libvirt $(whoami)
 newgrp libvirt #add user to libvert group
 sudo systemctl restart libvirtd.service
@@ -115,10 +118,23 @@ sudo vim /etc/libvirt/network.conf # firewell backend to iptables
 sudo systemctl enable iptables.service 
 sudo systemctl start iptables.service 
 sudo systemctl restart libvirtd.service
+```
 ### AMD Processor ###
+```bash
 sudo modprobe -r kvm_amd
 sudo modprobe kvm_amd nested=1
 echo "options kvm-amd nested=1" | sudo tee /etc/modprobe.d/amd-intel.conf
+```
+```bash
+yay -S tuned
+sudo systemctl enable tuned.service
+tuned --version
+sudo systemctl enable tuned.service --now
+tuned-adm active
+sudo tuned-adm profile virtual-host
+sudo virsh net-list --all
+sudo virsh net-start default
+sudo virsh net-autostart default
 ```
 ```bash
 sudo iptables -t nat -A PREROUTING -p tcp --dport 8080 -j DNAT --to-destination 192.168.122.100:8080
