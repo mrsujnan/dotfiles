@@ -79,6 +79,9 @@ alias startllama='sudo systemctl start ollama'
 alias stopllama='sudo systemctl stop ollama'
 alias spl='cd /home/injustice/Documents/splitgram/'
 alias resolve='/opt/resolve/bin/resolve'
+alias gitpushdate=' git add --all && git commit -m "$(date)" && git push --force'
+alias pacins='sudo pacman -Sy'
+alias gitfetch=' git fetch --all | git reset --hard origin/main'
 
 # Shell integrations
 eval "$(fzf --zsh)"
